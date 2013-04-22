@@ -5,16 +5,19 @@ import org.apache.zookeeper.server.auth.AuthenticationProvider;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import org.apache.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.data.Id;
 import org.apache.zookeeper.server.ServerCnxn;
 
 public class PasswordAuthenticationProvider implements AuthenticationProvider {
-    /** specify a command line property with key of 
-     * "zookeeper.PasswordAuthenticationProvider.passwordDigest"
-     * and value of `base64encoded( SHA1( password ) )`
+    private static final Logger LOG = Logger.getLogger(PasswordAuthenticationProvider.class);
+
+    /** specify a command line property with key of
+     * "zookeeper.PasswordAuthenticationProvider.passwordDigest" and value of
+     * `base64encoded( SHA1( password ) )`
      */
-    private final static String passwordDigest = System.getProperty("zookeeper.PasswordAuthenticationProvider.passwordDigest");
+    private final static String masterDigest = System.getProperty("zookeeper.PasswordAuthenticationProvider.passwordDigest");
 
     public String getScheme() {
         return "password";
@@ -75,14 +78,14 @@ public class PasswordAuthenticationProvider implements AuthenticationProvider {
         String givenPassword = new String(authData);
         try {
             String givenDigest = generateDigest(givenPassword);
-            if (givenDigest.equals(passwordDigest)) {
-              cnxn.getAuthInfo().add(new Id("password", givenDigest));
+            if (givenDigest.equals(masterDigest)) {
+              cnxn.getAuthInfo().add(new Id(getScheme(), givenDigest));
               return KeeperException.Code.OK;
             } else {
               return KeeperException.Code.AUTHFAILED;
             }
         } catch (NoSuchAlgorithmException e) {
-          // TODO
+          LOG.error("Missing algorithm",e);
         }
         return KeeperException.Code.AUTHFAILED;
     }
