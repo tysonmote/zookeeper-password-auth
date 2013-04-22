@@ -3,36 +3,26 @@ package com.stovepipestudios.zookeeper.server.auth;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import junit.framework.Assert;
 
-/**
- * Unit test for simple App.
- */
-public class PasswordAuthenticationProviderTest
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public PasswordAuthenticationProviderTest( String testName )
-    {
+import java.security.NoSuchAlgorithmException;
+import org.apache.commons.codec.binary.Base64;
+
+public class PasswordAuthenticationProviderTest extends TestCase {
+    public PasswordAuthenticationProviderTest( String testName ) {
         super( testName );
     }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
+    public static Test suite() {
         return new TestSuite( PasswordAuthenticationProviderTest.class );
     }
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+    public void testPasswordAuthenticationProvider() {
+      try {
+            Assert.assertEquals( "iEPX+SQWIR3p67lj/0zigSWTKHg=", PasswordAuthenticationProvider.generateDigest( "foobar" ) );
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("NoSuchAlgorithmException");
+            assertTrue( false );
+        }
     }
 }
